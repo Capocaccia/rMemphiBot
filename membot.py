@@ -51,10 +51,10 @@ def fetchdata(url):
 
 def run_membot(reddit):
 
-    print("Getting 250 comments...\n")
+    print("Getting 250 posts...\n")
 
-    for comment in reddit.subreddit('test').comments(limit = 250):
-        match = re.findall("\W*(barbecue)\W*", comment.body)
+    for post in reddit.subreddit('test').new(limit = 250):
+        match = re.findall("\W*(barbecue)\W*", post.title)
         if match:
             print('Matched!')
             file_obj_r = open(path,'r')
@@ -65,14 +65,14 @@ def run_membot(reddit):
                 print('Exception!!! Possibly incorrect xkcd URL...\n')
                 # Typical cause for this will be a URL for an xkcd that does not exist (Example: https://www.xkcd.com/772524318/)
             else:
-                if comment.id not in file_obj_r.read().splitlines():
+                if post.id not in file_obj_r.read().splitlines():
                     print('Link is unique...posting explanation\n')
-                    comment.reply(header + explanation + footer)
+                    post.reply(header + explanation + footer)
 
                     file_obj_r.close()
 
                     file_obj_w = open(path,'a+')
-                    file_obj_w.write(comment.id + '\n')
+                    file_obj_w.write(post.id + '\n')
                     file_obj_w.close()
                 else:
                     print('Already visited link...no reply needed\n')
