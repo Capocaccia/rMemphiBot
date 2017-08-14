@@ -49,51 +49,44 @@ def fetchdata(url):
     return data
 
 
-def run_explainbot(reddit):
+def run_membot(reddit):
 
     print("Getting 250 comments...\n")
 
-        for comment in reddit.subreddit('test').comments(limit = 250):
-            match = re.findall("[a-z]*[A-Z]*[0-9]*https://www.xkcd.com/[0-9]+", comment.body)
-            if match:
-                print('Link found in comment with comment ID: ' + comment.id)
-                xkcd_url = match[0]
-                print('Link: ' + xkcd_url)
+    for comment in reddit.subreddit('test').comments(limit = 250):
+        match = re.findall("\W*(barbecue)\W*", comment.body)
+        if match:
+            print('Matched!')
+            file_obj_r = open(path,'r')
 
-                url_obj = urlparse(xkcd_url)
-                xkcd_id = int((url_obj.path.strip("/")))
-                myurl = 'http://www.explainxkcd.com/wiki/index.php/' + str(xkcd_id)
+            try:
+                explanation = 'BARBECUE INFO'
+            except:
+                print('Exception!!! Possibly incorrect xkcd URL...\n')
+                # Typical cause for this will be a URL for an xkcd that does not exist (Example: https://www.xkcd.com/772524318/)
+            else:
+                if comment.id not in file_obj_r.read().splitlines():
+                    print('Link is unique...posting explanation\n')
+                    comment.reply(header + explanation + footer)
 
-                file_obj_r = open(path,'r')
+                    file_obj_r.close()
 
-                try:
-                    explanation = fetchdata(myurl)
-                except:
-                    print('Exception!!! Possibly incorrect xkcd URL...\n')
-                    # Typical cause for this will be a URL for an xkcd that does not exist (Example: https://www.xkcd.com/772524318/)
+                    file_obj_w = open(path,'a+')
+                    file_obj_w.write(comment.id + '\n')
+                    file_obj_w.close()
                 else:
-                    if comment.id not in file_obj_r.read().splitlines():
-                        print('Link is unique...posting explanation\n')
-                        comment.reply(header + explanation + footer)
+                    print('Already visited link...no reply needed\n')
 
-                        file_obj_r.close()
+            time.sleep(10)
 
-                        file_obj_w = open(path,'a+')
-                        file_obj_w.write(comment.id + '\n')
-                        file_obj_w.close()
-                    else:
-                        print('Already visited link...no reply needed\n')
-
-                time.sleep(10)
-
-        print('Waiting 60 seconds...\n')
-        time.sleep(60)
+    print('Waiting 60 seconds...\n')
+    time.sleep(60)
 
 
 def main():
     reddit = authenticate()
     while True:
-        run_explainbot(reddit)
+        run_membot(reddit)
 
 
 if __name__ == '__main__':
