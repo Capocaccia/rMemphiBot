@@ -14,9 +14,8 @@ import bs4
 path = '/Users/Carter/code/rMemphiBot/commented.txt'
 # Location of file where id's of already visited comments are maintained
 
-header = 'MemBot provides information about the city of Memphis Tennessee to /r/Memphis users. /n'
-footer = '/n MemBotpytho is provided by /u/CaptainInsane-o.  Source code available upon request.'
-# Text to be posted along with comic description
+header = 'MemBot provides information about the city of Memphis Tennessee to /r/Memphis users.'
+footer = 'MemBot is provided by /u/CaptainInsane-o.  Source code available upon request.'
 
 
 def authenticate():
@@ -25,29 +24,6 @@ def authenticate():
     reddit = praw.Reddit('MemBot', user_agent = 'web:A FAQ bot for /r/Memphis (by /u/CaptainInsane-o)')
     print('Authenticated as {}\n'.format(reddit.user.me()))
     return reddit
-
-
-def fetchdata(url):
-
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content, 'html.parser')
-
-    tag = soup.find('p')
-    data = ''
-    while True:
-        if isinstance(tag, bs4.element.Tag):
-            if (tag.name == 'h2'):
-                break
-            if (tag.name == 'h3'):
-                tag = tag.nextSibling
-            else:
-                data = data + '\n' + tag.text
-                tag = tag.nextSibling
-        else:
-            tag = tag.nextSibling
-
-    return data
-
 
 def run_membot(reddit):
 
@@ -60,14 +36,13 @@ def run_membot(reddit):
             file_obj_r = open(path,'r')
 
             try:
-                explanation = '<p><strong>BBQ</strong></p><p><a href="https://www.yelp.com/biz/tops-bar-b-q-memphis-12">Tops Bar-B-Q</a> - Ask for white chop, good burgers  </p><p><a href="https://www.yelp.com/biz/central-bbq-memphis-3">Central BBQ</a> – 3 locations, downtown, summer ave and midtown. Nachos with house chips  </p><p><a href="https://www.yelp.com/biz/paynes-bar-b-que-memphis">Payne’s Bar-B-Que</a> – Slaw Dog, BBQ Baloney, CASH ONLY</p><p><a href="https://www.yelp.com/biz/the-bar-b-q-shop-memphis-5">The Bar-B-Q Shop</a> – BBQ Spagetti  </p><p><a href="https://www.yelp.com/biz/corkys-ribs-and-bbq-memphis-2">Corky’s Ribs &amp; BBQ</a> – Ribs and Catfish  </p><p><a href="https://www.yelp.com/biz/cozy-corner-restaurant-memphis-20">Cozy Corner Restaurant</a> – Cornish hen and rib tips  </p><p><a href="http://www.commissarybbq.com">Commissary BBQ</a> – Germantown</p><p><a href="https://www.yelp.com/biz/leonards-pit-barbecue-memphis">Leonard’s Pit Barbecue</a> - buffet  </p><p><a href="https://www.yelp.com/biz/interstate-barbecue-memphis">Interstate Barbecue</a> – BBQ spaghetti  </p><p><a href="https://www.yelp.com/biz/one-and-only-bbq-memphis-4">One &amp;  Only BBQ</a>  </p><p><a href="https://www.yelp.com/biz/toms-barbecue-and-deli-memphis-3">Tom’s Barbecue and Deli</a> – rib tips  Featured on Diners Drive Ins and Dives</p><p><em>TOURIST BBQ</em> <a href="https://www.yelp.com/biz/charlie-vergos-rendezvous-memphis">Rendezvous BBQ</a> – they don’t slow smoke their ribs, they grill them  </p>'
+                reply = '**BBQ**' + '\n\n' + '[Tops Bar-B-Q](https://www.yelp.com/biz/tops-bar-b-q-memphis-12) - Ask for white chop, good burgers' + '\n\n' + '[Central BBQ](https://www.yelp.com/biz/central-bbq-memphis-3) – 3 locations, downtown, summer ave and midtown. Nachos with house chips' + '\n\n' + ' [Payne’s Bar-B-Que](https://www.yelp.com/biz/paynes-bar-b-que-memphis) – Slaw Dog, BBQ Baloney, CASH ONLY' + '\n\n' + '[The Bar-B-Q Shop](https://www.yelp.com/biz/the-bar-b-q-shop-memphis-5) – BBQ Spagetti' + '\n\n' + '[Corky’s Ribs & BBQ](https://www.yelp.com/biz/corkys-ribs-and-bbq-memphis-2) – Ribs and Catfish' + '\n\n' + '[Cozy Corner Restaurant](https://www.yelp.com/biz/cozy-corner-restaurant-memphis-20) – Cornish hen and rib tips' + '\n\n' + '[Commissary BBQ](http://www.commissarybbq.com) – Germantown' + '\n\n' + '[Leonard’s Pit Barbecue](https://www.yelp.com/biz/leonards-pit-barbecue-memphis) - buffet' + '\n\n' + '[Interstate Barbecue](https://www.yelp.com/biz/interstate-barbecue-memphis) – BBQ spaghetti' + '\n\n' + '[One & Only BBQ](https://www.yelp.com/biz/one-and-only-bbq-memphis-4)' + '\n\n' + '[Tom’s Barbecue and Deli](https://www.yelp.com/biz/toms-barbecue-and-deli-memphis-3) – rib tips Featured on Diners Drive Ins and Dives' + '\n\n' + '[Rendezvous BBQ](https://www.yelp.com/biz/charlie-vergos-rendezvous-memphis) – they don’t slow smoke their ribs, they grill them'
             except:
-                print('Exception!!! Possibly incorrect xkcd URL...\n')
-                # Typical cause for this will be a URL for an xkcd that does not exist (Example: https://www.xkcd.com/772524318/)
+                print('Error above line 41.\n')
             else:
                 if post.id not in file_obj_r.read().splitlines():
-                    print('Link is unique...posting explanation\n')
-                    post.reply(header + explanation + footer)
+                    print('Link is unique...posting reply\n')
+                    post.reply(header + '\n\n' + reply + '\n\n' + footer)
 
                     file_obj_r.close()
 
@@ -75,7 +50,7 @@ def run_membot(reddit):
                     file_obj_w.write(post.id + '\n')
                     file_obj_w.close()
                 else:
-                    print('Already visited link...no reply needed\n')
+                    print('Already visited link...no reply will be posted\n')
 
             time.sleep(10)
 
